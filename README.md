@@ -27,3 +27,30 @@ Options are:
 * `-3 (--use-python-3)`: Makes the resulting code runnable in Python 3 instead of Python 2.
 
 # Please note that this program can be very slow for large inputs.
+
+## How the algorithm works:
+
+The inner workings of this program is rather simple. Basically, all it does is finds a segment in the text that repeats itself a lot, and replaces that text with something shorter, and then in the resulting program, replacing that shorter bit back into the original segment.
+
+For example, if the input is: `Java 1.0, Java 1.1, Java 1.2, Java 1.3`, we could replace `Java 1.` with something else, like `!`, making the text `!0, !1, !2, !3`.
+
+We repeat this process for as long as it's effective, and the shortest of three programs that replace back all the shortened signs back into the original corresponding segment. These programs are:
+
+```python
+print"shortened_text".replace("sign1","segment1").replace("sign2","segment2")...etc
+```
+
+```python
+s="shortened_text"
+for c in "sign1segment1:sign2segment2:sign3segment3...".split(":"):s=s.replace(c[0],c[1:])
+print s
+```
+
+```python
+print"original_text"
+```
+
+In each of these programs, `shortened_text` is the text with all the shortened signs in place, `signN` and `segmentN` are the n-th sign and segment (`!` and `Java 1.` in our example above), and also, in the second case, the `:` doesn't have to be a `:`, it can be any character really. The last case is just there in case the compression wasn't effective, it doesn't have any overhead and only expands the input by a little bit.
+
+If the `--use-python-3` flag is used, `print ` is replaced by `print()`, and if the `--exec` flag is used, `print` is replaced with `exec`.
+
