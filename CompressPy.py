@@ -12,7 +12,7 @@ def findReplace(text):
             seg = text[pos : pos + length]
             count = text.count(seg)
             score = length * (count - 1)
-            
+
             if score > bestScore:
                 best = seg
                 bestScore = score
@@ -63,9 +63,7 @@ if args.input != None:
         sys.exit()
 else:
     # Read from stdin
-    text_orig = ""
-    for line in sys.stdin:
-        text_orig += line
+    text_orig = sys.stdin.read()
 
 
 text = text_orig
@@ -131,3 +129,4 @@ if not args.quiet:
     print("Original length:", len(text_orig), file=sys.stderr)
     print("Compressed length:", len(res), file=sys.stderr)
     print("Compressed by %.2f%%" % (100 * (1 - len(res) / len(text_orig))), file=sys.stderr)
+
