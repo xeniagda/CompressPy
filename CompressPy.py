@@ -39,10 +39,16 @@ def quote(text):
         return "'''" + text + "'''"
     return repr(text)
 
+def method_int(x):
+    x = int(x)
+    if not 0 <= x <= 2:
+        raise argparse.ArgumentTypeError("Method must be between 0 and 2")
+    return x
 
 parser = argparse.ArgumentParser(description="Make a short, obfuscated Python program, printing a specific string")
 parser.add_argument("-o", "--output", metavar="PATH", nargs=1, type=str, help="The output destination for the resulting program. If not specified, output goes to STDOUT")
 parser.add_argument("-i", "--input", metavar="PATH", nargs=1, type=str, help="Specifies a path from which the input should be taken. If not specified, input comes from STDIN and is terminated by EOF")
+parser.add_argument("-m", "--method", nargs=1, type=method_int, help="Set the method for compressing. 0 = Build a string, 1 = Simple replacing, 2 = print the input in quotes. Normally the program uses the shortest of these")
 parser.add_argument("-q", "--quiet", action="store_true", help="By default, CompressPy displays original and resulting byte count along with compression rate, this option disables it")
 parser.add_argument("-e", "--exec", action="store_true", help="Instead of making a program that prints a message, the program instead executes it as Python code, using exec()")
 parser.add_argument("-S", "--secure-exec", action="store_true", help="Sometimes the output contains a declaration of the variable s, which can occasionally result in program breaking when using --exec. This option makes the program delete that variable just before execution")
@@ -107,13 +113,17 @@ if args.exec and args.secure_exec:
     possible_results.append('s=' + quote(text) + '\nfor c in' + quote(joinCh.join(replaces[::-1])) + '.split("' + joinCh + '"):s=s.replace(c[0],c[1:])\n' + action(" 'del s\\n'+s"))
 else:
     possible_results.append('s=' + quote(text) + '\nfor c in' + quote(joinCh.join(replaces[::-1])) + '.split("' + joinCh + '"):s=s.replace(c[0],c[1:])\n' + action(" s"))
+
 possible_results.append(action(quote(text) + ".replace(" + ").replace(".join(quote(r[0]) + "," + quote(r[1:]) for r in replaces) + ")"))
 possible_results.append(action(quote(text_orig)))
+
 if args.use_python_3:
     possible_results.append(text_orig)
 
 
 res = min(possible_results, key=len)
+if args.method:
+    res = possible_results[args.method[0]]
 
 if args.output:
     try:
